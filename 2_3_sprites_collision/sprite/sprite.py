@@ -15,7 +15,7 @@ class Sprite():
     @coord.setter
     def coord(self, value):
         if value < 0 or value > 29:
-            raise ValueError(f"The coord must be between 0 and 29.")
+            raise ValueError("The coord must be between 0 and 29.")
         self._coord = value  
 
     def move(self, index: int):

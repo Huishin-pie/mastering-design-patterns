@@ -20,7 +20,7 @@ class GameTemplate(ABC):
     @players.setter
     def players(self, value):
         if len(value) < 2 or len(value) > 4:
-            raise ValueError(f"Players must be between 2 and 4.")
+            raise ValueError("Players must be between 2 and 4.")
         self._players = value
 
     @abstractmethod

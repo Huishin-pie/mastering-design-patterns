@@ -15,4 +15,4 @@ class SameType(CollisionHandler):
         return copy.deepcopy(sprites)
 
     def match(self, sprite1, sprite2):
-        return type(sprite1) == type(sprite2) 
+        return type(sprite1) is type(sprite2) 

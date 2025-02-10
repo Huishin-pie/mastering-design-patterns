@@ -18,5 +18,5 @@ class Hero(Sprite):
     @hp.setter
     def hp(self, value):
         if value < 0:
-            raise ValueError(f"The hp must be greater than 0.")
+            raise ValueError("The hp must be greater than 0.")
         self._hp = value  
