@@ -18,8 +18,15 @@ class Rank(Enum):
     TWO = (15, "2")
 
     def __init__(self, value, display):
-        self._value_ = value
         self.display = display 
+        
+        
+    @classmethod
+    def from_display(self, value):
+        for rank in self:
+            if rank.display == value:
+                return rank
+        return None
 
 
 class Suit(Enum):
@@ -29,8 +36,15 @@ class Suit(Enum):
     SPADE = (3, "S")
     
     def __init__(self, value, display):
-        self._value_ = value
         self.display = display 
+        
+        
+    @classmethod
+    def from_display(self, value):
+        for suit in self:
+            if suit.display == value:
+                return suit
+        return None
 
 
 class Card(ABC):

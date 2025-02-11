@@ -45,17 +45,30 @@ class Big2():
         self._players = value
         
     def _create_deck(self):
-        #todo
-        #1. cli 輸入 52 張牌
-        #2. 解析成 card
-        #3. new Deck
-        
-        card_list = []
-        for suit in Suit:
-            for rank in Rank:
-                card_list.append(Card(rank, suit))
-
-        return Deck(card_list)
+        while True:
+            input_value = input("請輸入牌堆的牌: ")
+            
+            try:
+                card_list = input_value.split()
+                
+                if not card_list:
+                    print("輸入不能為空，請重新輸入")
+                    continue
+                
+                cards = []
+                for card in card_list:
+                    rank_str  = card.split("[")[1].split("]")[0]
+                    rank = Rank.from_display(rank_str)
+                    suit_str =  card[0]
+                    suit = Suit.from_display(suit_str)
+                    
+                    if rank and suit:
+                        cards.append(Card(rank, suit))
+                
+                return Deck(cards)
+                
+            except ValueError:
+                print("無效的輸入，請確保輸入的是有效的牌")
 
     def clear_top_play(self):
         self.top_play = None
@@ -68,14 +81,13 @@ class Big2():
             print("新的回合開始了。")
             
         elif type == MessageType.WINNER:
-            print(f"遊戲結束，遊戲的勝利者為 {self.top_play}")
+            print(f"遊戲結束，遊戲的勝利者為 {self.top_player}")
             
         elif type == MessageType.CURRENT_PLAYER:
             print(f"輪到{self.current_player}了")
             
         elif type == MessageType.HAND_CARDS:
             print(self.format_cards(self.current_player.hand_cards))
-            # print(" ".join(str(card) for card in self.current_player.cards))
             
         elif type == MessageType.ILLEGAL:
             print("此牌型不合法，請再嘗試一次。")
@@ -119,8 +131,6 @@ class Big2():
     def start(self):
         for player in self.players:
             player.name_self()
-            
-        self.deck.shuffle()
         
         while self.deck.cards:
             for player in self.players:
