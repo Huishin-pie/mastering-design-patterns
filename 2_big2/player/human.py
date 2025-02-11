@@ -11,7 +11,14 @@ class HumanPlayer(Player):
 
 
     def name_self(self):
-        self.name = input("請輸入你的名字:").strip()
+        while True:
+            name = input("請輸入你的名字:").strip()
+            if self._is_valid(name):
+                self.name = name
+                return
+            else:
+                print("輸入只能包含字母 (A-Z, a-z)、數字 (0-9) 和中文字")
+                continue
 
     def play_or_pass(self) -> Union[List[Card], None]:
         while True:
