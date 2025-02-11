@@ -17,10 +17,10 @@ class PairPattern(CardPattern):
     
     
     def __lt__(self, other: "PairPattern") -> bool:
-        self_value = self.cards[0].rank.value
-        other_value = other.cards[0].rank.value
+        self_max_suit = max(self.cards[0].suit.value, self.cards[1].suit.value)
+        other_max_suit = max(other.cards[0].suit.value, other.cards[1].suit.value)
 
-        return self_value < other_value
+        return (self.cards[0].rank.value, self_max_suit) < (other.cards[0].rank.value, other_max_suit)
         
         
     @property

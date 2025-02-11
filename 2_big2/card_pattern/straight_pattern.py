@@ -17,13 +17,12 @@ class StraightPattern(CardPattern):
         
     
     def __lt__(self, other: "StraightPattern") -> bool:
-        self_values = [card.rank.value for card in self.cards]
-        other_values = [card.rank.value for card in other.cards]
-
-        self_max_value = max(self_values)
-        other_max_value = max(other_values)
-
-        return self_max_value < other_max_value
+        self_max_card = max(self.cards, key=lambda card: card.rank.value)
+        other_max_card = max(other.cards, key=lambda card: card.rank.value)
+        
+        if self_max_card.rank.value != other_max_card.rank.value:
+            return self_max_card.rank.value < other_max_card.rank.value
+        return self_max_card.suit.value < other_max_card.suit.value
         
         
     @property
