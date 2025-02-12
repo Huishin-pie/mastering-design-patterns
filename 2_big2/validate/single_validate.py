@@ -29,8 +29,6 @@ class SingleValidate(ValidateHandler):
         if top_play is None:
             return new_card_pattern
         
-        print(new_card_pattern, top_play, new_card_pattern > top_play)
-        
         if new_card_pattern > top_play:
             return new_card_pattern
         else:

@@ -17,6 +17,7 @@ class StraightValidate(ValidateHandler):
     def is_straight(self, cards: List[Card]) -> bool:
         if len(cards) != 5:  
             return False
+        
         sorted_cards = sorted(cards, key=lambda card: card.rank.value)
 
         for i in range(4):

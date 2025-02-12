@@ -16,6 +16,7 @@ class PairValidate(ValidateHandler):
     def is_pair(self, cards: List[Card]) -> bool:
         if len(cards) != 2:  
             return False
+        
         return cards[0].rank == cards[1].rank
 
     def match(self, cards: List[Card], top_play: Optional[CardPattern]) -> bool:

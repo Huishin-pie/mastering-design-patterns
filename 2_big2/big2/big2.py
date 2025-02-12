@@ -28,7 +28,6 @@ class Big2():
         self.validate_handler = validate_handler
         self.deck: Deck = self._create_deck()
         self.top_player :Player = None
-        self.first_player :Player = None
         self.current_player :Player = None
         self.top_play :CardPattern = None
         self.round = 1
@@ -108,23 +107,21 @@ class Big2():
         else:
             return False
         
-    def get_first_player(self):
+    def get_current_player(self):
         if self.round == 1:
             for player in self.players:
                 if self.has_club3(player.hand_cards):
-                    self.first_player = player
                     self.current_player = player
                     break
         else:
-            self.first_player = self.top_player
             self.current_player = self.top_player
     
     def get_next_player(self):
         self.current_player = self.players[(self.current_player.order + 1) % len(self.players)]
         
     def format_cards(self, cards: List[Card]):
-        #todo
-        indices = " ".join(f"{i:<4}" for i in range(len(cards)))
+        formatted_cards = [str(card) for card in cards]
+        indices = " ".join(f"{i:<{len(formatted_cards[i])}}" for i in range(len(cards)))
         formatted_cards = " ".join(str(card) for card in cards)
         return f"{indices}\n{formatted_cards}"
 
@@ -182,7 +179,7 @@ class Big2():
         while not self.game_end():
             self.out_put_message(MessageType.NEW_ROUND)
             
-            self.get_first_player()
+            self.get_current_player()
             self.clear_top_play()
             
             pass_count = 0
