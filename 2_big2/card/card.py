@@ -18,6 +18,7 @@ class Rank(Enum):
     TWO = (15, "2")
 
     def __init__(self, value, display):
+        self._value_  = value
         self.display = display 
         
         
@@ -36,6 +37,7 @@ class Suit(Enum):
     SPADE = (3, "S")
     
     def __init__(self, value, display):
+        self._value_  = value
         self.display = display 
         
         
@@ -55,4 +57,4 @@ class Card(ABC):
 
     
     def __str__(self):
-        return f"{self.suit.name[0]}[{self.rank.display}]"
+        return f"{self.suit.display}[{self.rank.display}]"

@@ -1,9 +1,13 @@
+import traceback
+
+
 from big2.big2 import Big2
 from validate.single_validate import SingleValidate
 from validate.pair_validate import PairValidate
 from validate.straight_validate import StraightValidate
 from validate.fullhouse_validate import FullhouseValidate
 from player.human import HumanPlayer
+
 
 def main():
     try:
@@ -15,8 +19,8 @@ def main():
         ]
         game = Big2(players, SingleValidate(PairValidate(StraightValidate(FullhouseValidate(None)))))
         game.start()
-    except Exception as e:
-        print(e)
+    except Exception as e: 
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()

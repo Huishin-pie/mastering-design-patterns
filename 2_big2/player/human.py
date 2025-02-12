@@ -12,7 +12,7 @@ class HumanPlayer(Player):
 
     def name_self(self):
         while True:
-            name = input("請輸入你的名字:").strip()
+            name = input("請輸入你的名字: ").strip()
             if self._is_valid(name):
                 self.name = name
                 return
@@ -22,7 +22,7 @@ class HumanPlayer(Player):
 
     def play_or_pass(self) -> Union[List[Card], None]:
         while True:
-            input_value = input("請輸入序號:")
+            input_value = input("請輸入序號: ")
 
             if input_value == "-1":
                 return None
