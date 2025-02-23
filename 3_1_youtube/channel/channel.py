@@ -2,7 +2,7 @@ from typing import List
 
 
 from video.video import Video
-from subscriber.channel_observer import channelObserver
+from observer.channel_observer import channelObserver
 
 
 class Channel():
@@ -21,9 +21,13 @@ class Channel():
         for observer in self.observers:
             observer.update(self.name)
 
-    def register(self, observer: channelObserver):
+    def subscribe(self, observer: channelObserver):
         self.observers.append(observer)
+        observer.channels.append(self)
+        print(f"{observer.name} 訂閱了 {self.name}")
 
-    def unregister(self, observer: channelObserver):
+    def unsubscribe(self, observer: channelObserver):
         if observer in self.observers:
             self.observers.remove(observer)
+            observer.channels.remove(self)
+            print(f"{observer.name} 解除訂閱了 {self.name}")

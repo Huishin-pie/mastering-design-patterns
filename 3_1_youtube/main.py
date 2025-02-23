@@ -2,10 +2,9 @@ import traceback
 
 
 from channel.channel import Channel
-from subscriber.subscriber import Subscriber
 from video.video import Video
-from action.click_like import ClickLike
-from action.unsubscribe import Unsubscribe
+from observer.click_like_subscriber import ClickLikeSubscriber
+from observer.unsubscribe_subscriber import UnsubscribeSubscriber
 
 
 def main():
@@ -13,14 +12,14 @@ def main():
         pew_channel = Channel("PewDiePie")
         water_ball_channel = Channel("水球軟體學院")
 
-        water_subscriber = Subscriber("水球", ClickLike())
-        fire_subscriber = Subscriber("火球", Unsubscribe())
+        water_subscriber = ClickLikeSubscriber("水球")
+        fire_subscriber = UnsubscribeSubscriber("火球")
 
-        water_subscriber.subscribe(water_ball_channel)
-        water_subscriber.subscribe(pew_channel)
+        water_ball_channel.subscribe(water_subscriber)
+        pew_channel.subscribe(water_subscriber)
 
-        fire_subscriber.subscribe(water_ball_channel)
-        fire_subscriber.subscribe(pew_channel)
+        water_ball_channel.subscribe(fire_subscriber)
+        pew_channel.subscribe(fire_subscriber)
 
         water_ball_channel.upload(Video("C1M1S2", "這個世界正是物件導向的呢！", 240))
         pew_channel.upload(Video("Hello guys", "Clickbait", 30))
