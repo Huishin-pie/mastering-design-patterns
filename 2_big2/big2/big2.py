@@ -31,7 +31,6 @@ class Big2():
         self.current_player :Player = None
         self.top_play :CardPattern = None
         self.round = 1
-
     
     @property
     def players(self):
@@ -69,62 +68,6 @@ class Big2():
             except ValueError:
                 print("無效的輸入，請確保輸入的是有效的牌")
 
-    def clear_top_play(self):
-        self.top_play = None
-
-    def game_end(self) -> bool:
-        return any(len(player.hand_cards) == 0 for player in self.players)
-
-    def out_put_message(self, type: str):
-        if type == MessageType.NEW_ROUND:
-            print("新的回合開始了。")
-            
-        elif type == MessageType.WINNER:
-            print(f"遊戲結束，遊戲的勝利者為 {self.top_player}")
-            
-        elif type == MessageType.CURRENT_PLAYER:
-            print(f"輪到{self.current_player}了")
-            
-        elif type == MessageType.HAND_CARDS:
-            print(self.format_cards(self.current_player.hand_cards))
-            
-        elif type == MessageType.ILLEGAL:
-            print("此牌型不合法，請再嘗試一次。")
-            
-        elif type == MessageType.PASS:
-            print(f"玩家 {self.current_player} PASS")
-            
-        elif type == MessageType.CANNOT_PASS:
-            print("你不能在新的回合中喊 PASS")
-            
-        elif type == MessageType.PLAYED_CARD_PATTERN:
-            print(f"玩家 {self.current_player} 打出了 {str(self.top_play)}")
-            
-    def validate_play(self, cards: List[Card]) -> Union[CardPattern, bool]:
-        new_card_pattern = self.validate_handler.validate(cards, self.top_play)
-        if new_card_pattern is not None:
-            return new_card_pattern
-        else:
-            return False
-        
-    def get_current_player(self):
-        if self.round == 1:
-            for player in self.players:
-                if self.has_club3(player.hand_cards):
-                    self.current_player = player
-                    break
-        else:
-            self.current_player = self.top_player
-    
-    def get_next_player(self):
-        self.current_player = self.players[(self.current_player.order + 1) % len(self.players)]
-        
-    def format_cards(self, cards: List[Card]):
-        formatted_cards = [str(card) for card in cards]
-        indices = " ".join(f"{i:<{len(formatted_cards[i])}}" for i in range(len(cards)))
-        formatted_cards = " ".join(str(card) for card in cards)
-        return f"{indices}\n{formatted_cards}"
-
     def start(self):
         for player in self.players:
             player.name_self()
@@ -141,10 +84,33 @@ class Big2():
         self.take_turn()
         
         self.out_put_message(MessageType.WINNER)
-        
-    def has_club3(self, cards: List[Card]) -> bool:
-        return any(card.suit == Suit.CLUB and card.rank == Rank.THREE for card in cards)
-        
+
+    def take_turn(self):
+        while not self.game_end():
+            self.out_put_message(MessageType.NEW_ROUND)
+            
+            self.get_current_player()
+            self.clear_top_play()
+            
+            pass_count = 0
+            
+            while pass_count < 3:
+                self.out_put_message(MessageType.CURRENT_PLAYER)
+                
+                is_pass = self.play_turn()
+
+                if self.game_end():
+                    return
+
+                if is_pass:
+                    pass_count += 1
+                else:
+                    pass_count = 0
+
+                self.get_next_player()
+            
+            self.round += 1
+
     def play_turn(self) -> bool:
         self.out_put_message(MessageType.HAND_CARDS)
         
@@ -174,32 +140,66 @@ class Big2():
         
             self.out_put_message(MessageType.PLAYED_CARD_PATTERN)   
             return False
+        
+    def out_put_message(self, type: str):
+        if type == MessageType.NEW_ROUND:
+            print("新的回合開始了。")
             
-    def take_turn(self):
-        while not self.game_end():
-            self.out_put_message(MessageType.NEW_ROUND)
+        elif type == MessageType.WINNER:
+            print(f"遊戲結束，遊戲的勝利者為 {self.top_player}")
             
-            self.get_current_player()
-            self.clear_top_play()
+        elif type == MessageType.CURRENT_PLAYER:
+            print(f"輪到{self.current_player}了")
             
-            pass_count = 0
+        elif type == MessageType.HAND_CARDS:
+            print(self.format_cards(self.current_player.hand_cards))
             
-            while pass_count < 3:
-                self.out_put_message(MessageType.CURRENT_PLAYER)
-                
-                is_pass = self.play_turn()
+        elif type == MessageType.ILLEGAL:
+            print("此牌型不合法，請再嘗試一次。")
+            
+        elif type == MessageType.PASS:
+            print(f"玩家 {self.current_player} PASS")
+            
+        elif type == MessageType.CANNOT_PASS:
+            print("你不能在新的回合中喊 PASS")
+            
+        elif type == MessageType.PLAYED_CARD_PATTERN:
+            print(f"玩家 {self.current_player} 打出了 {str(self.top_play)}")
 
-                if self.game_end():
-                    return
+    def clear_top_play(self):
+        self.top_play = None
 
-                if is_pass:
-                    pass_count += 1
-                else:
-                    pass_count = 0
-
-                self.get_next_player()
+    def game_end(self) -> bool:
+        return any(len(player.hand_cards) == 0 for player in self.players)
             
-            self.round += 1
+    def validate_play(self, cards: List[Card]) -> Union[CardPattern, bool]:
+        new_card_pattern = self.validate_handler.validate(cards, self.top_play)
+        if new_card_pattern is not None:
+            return new_card_pattern
+        else:
+            return False
+        
+    def get_current_player(self):
+        if self.round == 1:
+            for player in self.players:
+                if self.has_club3(player.hand_cards):
+                    self.current_player = player
+                    break
+        else:
+            self.current_player = self.top_player
+    
+    def get_next_player(self):
+        self.current_player = self.players[(self.current_player.order + 1) % len(self.players)]
+        
+    def format_cards(self, cards: List[Card]):
+        formatted_cards = [str(card) for card in cards]
+        indices = " ".join(f"{i:<{len(formatted_cards[i])}}" for i in range(len(cards)))
+        formatted_cards = " ".join(str(card) for card in cards)
+        return f"{indices}\n{formatted_cards}"
+        
+    def has_club3(self, cards: List[Card]) -> bool:
+        return any(card.suit == Suit.CLUB and card.rank == Rank.THREE for card in cards)
+        
             
                 
             
