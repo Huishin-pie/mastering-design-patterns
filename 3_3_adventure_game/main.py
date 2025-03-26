@@ -1,10 +1,12 @@
 import traceback
 
 from game.game import Game
+from map.map import Map
 
 def main():
     try:
-        game = Game(10, 10)
+        map = Map(10, 10)
+        game = Game(map)
         game.start()
 
     except Exception as e: 

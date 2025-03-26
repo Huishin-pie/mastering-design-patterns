@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from enum import Enum
 from abc import ABC
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from map.map import Map
 
 class Symbol(Enum):
     TREASURE = 'x'
@@ -23,8 +27,9 @@ class Position:
     y: int
 
 class MapObject(ABC):
-    def __init__(self, symbol):
+    def __init__(self, symbol, map: "Map"):
         self.symbol = symbol
+        self.map = map
         self.position = Position(0, 0)
 
     def __str__(self): 

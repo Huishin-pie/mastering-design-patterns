@@ -2,7 +2,6 @@ from typing import List
 import random
 
 from map_object.map_object import MapObject, Position, Direction
-from map_object.role import State
 from map_object.treasure import Treasure, TreasureType
 from map_object.monster import Monster
 from map_object.character import Character
@@ -22,9 +21,25 @@ class Map:
 
     def _initMapObjects(self) -> List[MapObject]:
         width, height = self.width, self.height
+        self.grid: List[List[MapObject | None]] = [[None for _ in range(width)] for _ in range(height)]
 
-        init_map: List[List[MapObject | None]]  = [[None for _ in range(width)] for _ in range(height)]
+        self.add_treasures(random.randint(4, 6))
+        self.add_monsters(random.randint(4, 6))
+        self._place_obstacles(random.randint(3, 5))
+        self._place_character()
 
+        return self.grid
+    
+    def _get_random_position(self) -> tuple:
+        empty_positions = self.get_empty_positions()
+        if not empty_positions:
+            raise ValueError("No empty positions available")
+        return random.choice(empty_positions)
+            
+    def add_treasures(self, num_treasures: int):
+        if num_treasures == 0:
+            return
+        
         object_probabilities = {
             TreasureType.SUPER_STAR: 10,
             TreasureType.POISON: 25,
@@ -34,71 +49,41 @@ class Map:
             TreasureType.KINGS_ROCK: 10,
             TreasureType.DOKODEMO_DOOR: 10
         }
-
-        num_treasures = random.randint(4, 6)
-        num_monsters = random.randint(4, 6)
-        num_obstacles = random.randint(3, 5)
-
-        occupied_positions = set()
-
-        # Treasure
+        
         for _ in range(num_treasures):
-            while True:
-                x, y = random.randint(0, width - 1), random.randint(0, height - 1)
-                if (x, y) not in occupied_positions:
-                    break
-            occupied_positions.add((x, y))
-
+            position = self._get_random_position()
             treasure_type = random.choices(list(object_probabilities.keys()), weights=object_probabilities.values(), k=1)[0]
-            treasure = Treasure(treasure_type)
-            treasure.position = Position(x, y)
-            init_map[y][x] = treasure
+            treasure = Treasure(treasure_type, self)
+            treasure.position = position
+            self.grid[position.y][position.x] = treasure
 
-        # Monster
-        for _ in range(num_monsters):
-            while True:
-                x, y = random.randint(0, width - 1), random.randint(0, height - 1)
-                if (x, y) not in occupied_positions:
-                    break
-            occupied_positions.add((x, y))
+    def add_monsters(self, num_monsters: int):
+        if num_monsters == 0:
+            return
+        
+        num = len(self.get_monsters())
+        
+        for i in range(num_monsters):
+            position = self._get_random_position()
+            monster = Monster(f"Monster_{i + num}", self)
+            monster.position = position
+            self.grid[position.y][position.x] = monster
 
-            monster = Monster(_)
-            monster.position = Position(x, y)
-            init_map[y][x] = monster
-
-        # Obstacle
+    def _place_obstacles(self, num_obstacles: int):
         for _ in range(num_obstacles):
-            while True:
-                x, y = random.randint(0, width - 1), random.randint(0, height - 1)
-                if (x, y) not in occupied_positions:
-                    break
-            occupied_positions.add((x, y))
+            position = self._get_random_position()
+            obstacle = Obstacle(self)
+            obstacle.position = position
+            self.grid[position.y][position.x] = obstacle
 
-            obstacle = Obstacle()
-            obstacle.position = Position(x, y)
-            init_map[y][x] = obstacle
-
-        # Character
-        while True:
-            x, y = random.randint(0, width - 1), random.randint(0, height - 1)
-            if (x, y) not in occupied_positions:
-                break
-        occupied_positions.add((x, y))
-
-        character = Character(attack_range=max(width, height))
-        character.position = Position(x, y)
-        init_map[y][x] = character
-
-        return init_map
+    def _place_character(self):
+        position = self._get_random_position()
+        character = Character("Character", self)
+        character.position = position
+        self.grid[position.y][position.x] = character
 
     def is_within_bounds(self, x: int, y: int) -> bool:
         return 0 <= y < self.height and 0 <= x < self.width
-    
-    def add_object(self, x, y, obj):
-        if self.is_within_bounds(x, y):
-            self.grid[y][x] = obj
-        else:
-            raise ValueError("Coordinates out of bounds")
 
     def remove_object(self, x, y):
         if self.is_within_bounds(x, y):
@@ -115,17 +100,13 @@ class Map:
         }
 
         if direction not in direction_map:
-            # print("Invalid direction")
             return False
 
         dx, dy = direction_map[direction]
         new_x = obj.position.x + dx
         new_y = obj.position.y + dy
-        current_obj = self.grid[obj.position.y][obj.position.x]
-        print(new_x, new_y)
 
         if not self.is_within_bounds(new_x, new_y):
-            # print("not is_within_bounds")
             return False
         
         target_obj = self.grid[new_y][new_x]
@@ -133,18 +114,9 @@ class Map:
 
         if target_obj:
             if isinstance(target_obj, Treasure):
-                treasure_map = {
-                    TreasureType.SUPER_STAR: State.INVINCIBLE,
-                    TreasureType.POISON: State.POISONED,
-                    TreasureType.ACCELERATING_POTION: State.ACCELERATED,
-                    TreasureType.HEALING_POTION: State.HEALING,
-                    TreasureType.DEVIL_FRUIT: State.ORDERLESS,
-                    TreasureType.KINGS_ROCK: State.STOCKPILE,
-                    TreasureType.DOKODEMO_DOOR: State.TELEPORT
-                }
                 if isinstance(current_obj, Character) or isinstance(current_obj, Monster):
-                    print(f"Move success and touch the treasure, type is {target_obj.type}")
-                    current_obj.change_state(treasure_map[target_obj.type], 3)
+                    print(f"Move success and touch the treasure, type is {target_obj.type.value}")
+                    current_obj.change_state(target_obj.touch_action(current_obj))
                     self.grid[new_y][new_x] = None
             else:
                 print("Move success but there is an obstacle")
@@ -154,15 +126,7 @@ class Map:
         obj.position.x = new_x
         obj.position.y = new_y
         self.grid[new_y][new_x] = obj
-        # print("Move success")
         return True
-    
-    def monsters_alive(self) -> bool:
-        return any(
-            isinstance(cell, Monster) 
-            for row in self.grid for cell in row 
-            if cell is not None
-        )
 
     def get_character(self) -> Character:
         for row in self.grid:
@@ -207,4 +171,3 @@ class Map:
         return [
             Position(x, y) for y, row in enumerate(self.grid) for x, cell in enumerate(row) if cell is None
         ]
-    
