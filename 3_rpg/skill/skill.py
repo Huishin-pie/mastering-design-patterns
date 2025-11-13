@@ -29,9 +29,6 @@ class Skill(ABC):
     def get_mp_cost(self) -> int:
         return self.mp_cost
 
-    def check_mp_enough(self, role: 'Role') -> bool:
-        return role.mp >= self.mp_cost
-
     def _get_alives(self, roles: List['Role']) -> List['Role']:
         return [r for r in roles if r.is_alive()]
 

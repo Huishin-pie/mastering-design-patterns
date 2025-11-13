@@ -3,6 +3,7 @@ from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
     from role.role import Role
     from troop.troop import Troop
+    from skill.skill import Skill
 
 
 class RPG:
@@ -46,7 +47,7 @@ class RPG:
                     is_action_available = False
                     while not is_action_available:        
                         action_skill = member.select_action()
-                        is_action_available = action_skill.check_mp_enough(member)
+                        is_action_available = self._check_action_available(member, action_skill)
                         if not is_action_available:
                             print("你缺乏 MP，不能進行此行動。")
 
@@ -65,6 +66,11 @@ class RPG:
                 i += 1
 
             troop_index += 1
+
+    def _check_action_available(self, member: 'Role', action_skill: 'Skill') -> bool:
+        if member.mp >= action_skill.get_mp_cost():
+            return True
+        return False
 
     def _is_game_end(self) -> bool:
         if not self.troops[0].get_hero().is_alive():

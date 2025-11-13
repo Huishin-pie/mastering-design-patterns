@@ -15,6 +15,7 @@ class OnePunchAction(ABC):
         elif self.next:
             self.next.action(role, target)
 
+    @abstractmethod
     def match(self, role: Role) -> bool:
         return True
 

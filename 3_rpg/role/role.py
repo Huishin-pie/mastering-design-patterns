@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import List, TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
 from skill.skill_basic import SkillBasic
