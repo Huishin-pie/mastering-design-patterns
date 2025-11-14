@@ -40,7 +40,7 @@ def _skill_from_name(name: str):
         '詛咒': lambda: SkillCurse(),
         '石化': lambda: SkillPetrochemical(),
         '下毒': lambda: SkillPoison(),
-        '召喚': lambda: SkillSummon(),
+        '召喚': lambda: SkillSummon(StrategySeed()),
         '一拳攻擊': lambda: SkillOnePunch(
             OnePunchNormal(
                 OnePunchCheerup(

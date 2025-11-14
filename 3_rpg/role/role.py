@@ -74,13 +74,10 @@ class Role(ABC):
             return
         self.hp += amount
 
-    def spend_mp(self, amount: int) -> bool:
-        if amount <= 0:
-            return True
-        if self.mp >= amount:
-            self.mp -= amount
-            return True
-        return False
+    def spend_mp(self, amount: int) -> None:
+        if amount <= 0 or not self.is_alive():
+            return
+        self.mp = max(0, self.mp - amount)
 
     @abstractmethod
     def select_action(self) -> 'Skill':
